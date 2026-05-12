@@ -34,6 +34,7 @@ BOTTOM_RECT = (0, GAME_HEIGHT + 1, WINDOW_WIDTH,
                                 WINDOW_HEIGHT - GAME_HEIGHT)
 STATE_WAITING = 'waiting'
 STATE_PLAYING = 'playing'
+STATE_PAUSED = 'paused'
 STATE_GAME_OVER = 'game over'
 POINTS_PER_DIFFICULTY_LEVEL = 100
 MAX_DIFFICULTY_LEVEL = 5
@@ -76,6 +77,16 @@ class ScenePlay(pyghelpers.Scene):
 
         self.gameOverImage = pygwidgets.Image(self.window, (140, 180),
                                         'images/gameOver.png')
+
+        self.pausedText = pygwidgets.DisplayText(self.window,
+                                        (0, 210), 'PAUSED',
+                                        width=WINDOW_WIDTH, justified='center',
+                                        fontSize=64, textColor=WHITE)
+
+        self.pausedHintText = pygwidgets.DisplayText(self.window,
+                                        (0, 285), 'Press P to resume',
+                                        width=WINDOW_WIDTH, justified='center',
+                                        fontSize=28, textColor=WHITE)
 
         self.titleText = pygwidgets.DisplayText(self.window,
                                         (70, GAME_HEIGHT + 17),
@@ -142,8 +153,23 @@ class ScenePlay(pyghelpers.Scene):
         pygame.mouse.set_visible(False)
 
     def handleInputs(self, eventsList, keyPressedList):
+        for event in eventsList:
+            if event.type == KEYDOWN:
+                if event.key == K_p:
+                    if self.playingState == STATE_PLAYING:
+                        self.playingState = STATE_PAUSED
+                        pygame.mouse.set_visible(True)
+                        pygame.mixer.music.pause()
+                    elif self.playingState == STATE_PAUSED:
+                        self.playingState = STATE_PLAYING
+                        pygame.mouse.set_visible(False)
+                        if self.backgroundMusic:
+                            pygame.mixer.music.unpause()
+
         if self.playingState == STATE_PLAYING:
             return  # ignore button events while playing
+        elif self.playingState == STATE_PAUSED:
+            return  # only listen for the pause key while paused
 
         for event in eventsList:
             if self.newGameButton.handleEvent(event):
@@ -235,6 +261,10 @@ class ScenePlay(pyghelpers.Scene):
 
         if self.playingState == STATE_GAME_OVER:
             self.gameOverImage.draw()
+
+        elif self.playingState == STATE_PAUSED:
+            self.pausedText.draw()
+            self.pausedHintText.draw()
 
     def leave(self):
         pygame.mixer.music.stop()
