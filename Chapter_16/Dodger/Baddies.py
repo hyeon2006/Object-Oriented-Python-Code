@@ -14,7 +14,7 @@ class Baddie():
     # Load the image only once
     BADDIE_IMAGE = pygame.image.load('images/baddie.png')
 
-    def __init__(self, window):
+    def __init__(self, window, speedAdjustment=0):
         self.window = window
         # Create the image object
         size = random.randrange(Baddie.MIN_SIZE, Baddie.MAX_SIZE + 1)
@@ -26,8 +26,9 @@ class Baddie():
         # Scale it
         percent = (size * 100) / Baddie.MAX_SIZE
         self.image.scale(percent, False)
-        self.speed = random.randrange(Baddie.MIN_SPEED,
-                                                      Baddie.MAX_SPEED + 1)
+        self.speed = (random.randrange(Baddie.MIN_SPEED,
+                                                      Baddie.MAX_SPEED + 1) +
+                                                      speedAdjustment)
 
     def update(self):  # move the Baddie down
         self.y = self.y + self.speed
@@ -47,6 +48,7 @@ class Baddie():
 # BaddieMgr class
 class BaddieMgr():
     ADD_NEW_BADDIE_RATE = 8  # how often to add a new Baddie
+    MIN_ADD_NEW_BADDIE_RATE = 3
 
     def __init__(self, window):
         self.window = window
@@ -56,7 +58,7 @@ class BaddieMgr():
         self.baddiesList = []
         self.nFramesTilNextBaddie = BaddieMgr.ADD_NEW_BADDIE_RATE
 
-    def update(self):
+    def update(self, difficultyLevel=0):
         # Tell each Baddie to update itself
         # Count how many Baddies have fallen off the bottom.
         nBaddiesRemoved = 0
@@ -70,9 +72,11 @@ class BaddieMgr():
         # Check if it's time to add a new Baddie
         self.nFramesTilNextBaddie = self.nFramesTilNextBaddie - 1
         if self.nFramesTilNextBaddie == 0:
-            oBaddie = Baddie(self.window)
+            oBaddie = Baddie(self.window, difficultyLevel)
             self.baddiesList.append(oBaddie)
-            self.nFramesTilNextBaddie = BaddieMgr.ADD_NEW_BADDIE_RATE
+            addNewBaddieRate = max(BaddieMgr.MIN_ADD_NEW_BADDIE_RATE,
+                                   BaddieMgr.ADD_NEW_BADDIE_RATE - difficultyLevel)
+            self.nFramesTilNextBaddie = addNewBaddieRate
 
         # Return that count of Baddies that were removed
         return nBaddiesRemoved

@@ -35,6 +35,8 @@ BOTTOM_RECT = (0, GAME_HEIGHT + 1, WINDOW_WIDTH,
 STATE_WAITING = 'waiting'
 STATE_PLAYING = 'playing'
 STATE_GAME_OVER = 'game over'
+POINTS_PER_DIFFICULTY_LEVEL = 100
+MAX_DIFFICULTY_LEVEL = 5
 
 class ScenePlay(pyghelpers.Scene):
 
@@ -103,6 +105,7 @@ class ScenePlay(pyghelpers.Scene):
         self.lowestHighScore = 0
         self.backgroundMusic = True
         self.score = 0
+        self.difficultyLevel = 0
         self.playingState = STATE_WAITING
 
     def getSceneKey(self):
@@ -122,6 +125,7 @@ class ScenePlay(pyghelpers.Scene):
 
     def reset(self):   # start a new game
         self.score = 0
+        self.difficultyLevel = 0
         self.scoreText.setValue(self.score)
         self.getHiAndLowScores()
 
@@ -170,10 +174,15 @@ class ScenePlay(pyghelpers.Scene):
             self.dingSound.play()
             self.score = self.score + (nGoodiesHit * POINTS_FOR_GOODIE)
 
+        self.difficultyLevel = min(MAX_DIFFICULTY_LEVEL,
+                                   self.score // POINTS_PER_DIFFICULTY_LEVEL)
+
         # Tell the BaddieMgr to move all the Baddies
         # Returns the number of Baddies that fell off the bottom
-        nBaddiesEvaded  = self.oBaddieMgr.update()
+        nBaddiesEvaded  = self.oBaddieMgr.update(self.difficultyLevel)
         self.score = self.score + (nBaddiesEvaded * POINTS_FOR_BADDIE_EVADED)
+        self.difficultyLevel = min(MAX_DIFFICULTY_LEVEL,
+                                   self.score // POINTS_PER_DIFFICULTY_LEVEL)
         
         self.scoreText.setValue(self.score)
 
