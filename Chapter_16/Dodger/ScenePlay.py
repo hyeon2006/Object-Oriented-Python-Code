@@ -1,111 +1,166 @@
 #  Play scene - the main game play scene
-from pygame.locals import *
-import pygwidgets
+import pygame
 import pyghelpers
-from Player import *
-from Baddies import *
-from Goodies import *
+import pygwidgets
+from Baddies import BaddieMgr
+from Constants import (
+    BLACK,
+    GAME_HEIGHT,
+    HIGH_SCORES_DATA,
+    POINTS_FOR_BADDIE_EVADED,
+    POINTS_FOR_GOODIE,
+    SCENE_HIGH_SCORES,
+    SCENE_PLAY,
+    WHITE,
+    WINDOW_HEIGHT,
+    WINDOW_WIDTH,
+)
+from Goodies import GoodieMgr
+from Player import Player
+from pygame.locals import KEYDOWN, K_p
+
 
 def showCustomYesNoDialog(theWindow, theText):
-    oDialogBackground = pygwidgets.Image(theWindow, (40, 250),
-                                            'images/dialog.png')
-    oPromptDisplayText = pygwidgets.DisplayText(theWindow, (0, 290),
-                                            theText, width=WINDOW_WIDTH,
-                                            justified='center', fontSize=36)
+    oDialogBackground = pygwidgets.Image(theWindow, (40, 250), "images/dialog.png")
+    oPromptDisplayText = pygwidgets.DisplayText(
+        theWindow,
+        (0, 290),
+        theText,
+        width=WINDOW_WIDTH,
+        justified="center",
+        fontSize=36,
+    )
 
-    oYesButton = pygwidgets.CustomButton(theWindow, (320, 370),
-                                            'images/gotoHighScoresNormal.png',
-                                            over='images/gotoHighScoresOver.png',
-                                            down='images/gotoHighScoresDown.png',
-                                            disabled='images/gotoHighScoresDisabled.png')
+    oYesButton = pygwidgets.CustomButton(
+        theWindow,
+        (320, 370),
+        "images/gotoHighScoresNormal.png",
+        over="images/gotoHighScoresOver.png",
+        down="images/gotoHighScoresDown.png",
+        disabled="images/gotoHighScoresDisabled.png",
+    )
 
-    oNoButton = pygwidgets.CustomButton(theWindow, (62, 370),
-                                            'images/noThanksNormal.png',
-                                            over='images/noThanksOver.png',
-                                            down='images/noThanksDown.png',
-                                            disabled='images/noThanksDisabled.png')
+    oNoButton = pygwidgets.CustomButton(
+        theWindow,
+        (62, 370),
+        "images/noThanksNormal.png",
+        over="images/noThanksOver.png",
+        down="images/noThanksDown.png",
+        disabled="images/noThanksDisabled.png",
+    )
 
-    choiceAsBoolean = pyghelpers.customYesNoDialog(theWindow,
-                                            oDialogBackground, oPromptDisplayText,
-                                            oYesButton, oNoButton)
+    choiceAsBoolean = pyghelpers.customYesNoDialog(
+        theWindow, oDialogBackground, oPromptDisplayText, oYesButton, oNoButton
+    )
     return choiceAsBoolean
 
-BOTTOM_RECT = (0, GAME_HEIGHT + 1, WINDOW_WIDTH,
-                                WINDOW_HEIGHT - GAME_HEIGHT)
-STATE_WAITING = 'waiting'
-STATE_PLAYING = 'playing'
-STATE_PAUSED = 'paused'
-STATE_GAME_OVER = 'game over'
+
+BOTTOM_RECT = (0, GAME_HEIGHT + 1, WINDOW_WIDTH, WINDOW_HEIGHT - GAME_HEIGHT)
+STATE_WAITING = "waiting"
+STATE_PLAYING = "playing"
+STATE_PAUSED = "paused"
+STATE_GAME_OVER = "game over"
 POINTS_PER_DIFFICULTY_LEVEL = 100
 MAX_DIFFICULTY_LEVEL = 5
 
-class ScenePlay(pyghelpers.Scene):
 
+class ScenePlay(pyghelpers.Scene):
     def __init__(self, window):
         self.window = window
 
-        self.controlsBackground = pygwidgets.Image(self.window,
-                                        (0, GAME_HEIGHT),
-                                        'images/controlsBackground.jpg')
+        self.controlsBackground = pygwidgets.Image(
+            self.window, (0, GAME_HEIGHT), "images/controlsBackground.jpg"
+        )
 
-        self.quitButton = pygwidgets.CustomButton(self.window,
-                                        (30, GAME_HEIGHT + 90),
-                                        up='images/quitNormal.png',
-                                        down='images/quitDown.png',
-                                        over='images/quitOver.png',
-                                        disabled='images/quitDisabled.png')
+        self.quitButton = pygwidgets.CustomButton(
+            self.window,
+            (30, GAME_HEIGHT + 90),
+            up="images/quitNormal.png",
+            down="images/quitDown.png",
+            over="images/quitOver.png",
+            disabled="images/quitDisabled.png",
+        )
 
-        self.highScoresButton = pygwidgets.CustomButton(self.window,
-                                        (190, GAME_HEIGHT + 90),
-                                        up='images/gotoHighScoresNormal.png',
-                                        down='images/gotoHighScoresDown.png',
-                                        over='images/gotoHighScoresOver.png',
-                                        disabled='images/gotoHighScoresDisabled.png')
+        self.highScoresButton = pygwidgets.CustomButton(
+            self.window,
+            (190, GAME_HEIGHT + 90),
+            up="images/gotoHighScoresNormal.png",
+            down="images/gotoHighScoresDown.png",
+            over="images/gotoHighScoresOver.png",
+            disabled="images/gotoHighScoresDisabled.png",
+        )
 
-        self.newGameButton = pygwidgets.CustomButton(self.window,
-                                        (450, GAME_HEIGHT + 90),
-                                        up='images/startNewNormal.png',
-                                        down='images/startNewDown.png',
-                                        over='images/startNewOver.png',
-                                        disabled='images/startNewDisabled.png',
-                                        enterToActivate=True)
+        self.newGameButton = pygwidgets.CustomButton(
+            self.window,
+            (450, GAME_HEIGHT + 90),
+            up="images/startNewNormal.png",
+            down="images/startNewDown.png",
+            over="images/startNewOver.png",
+            disabled="images/startNewDisabled.png",
+            enterToActivate=True,
+        )
 
-        self.soundCheckBox = pygwidgets.TextCheckBox(self.window,
-                                        (430, GAME_HEIGHT + 17),
-                                        'Background music',
-                                        True, textColor=WHITE)
+        self.soundCheckBox = pygwidgets.TextCheckBox(
+            self.window,
+            (430, GAME_HEIGHT + 17),
+            "Background music",
+            True,
+            textColor=WHITE,
+        )
 
-        self.gameOverImage = pygwidgets.Image(self.window, (140, 180),
-                                        'images/gameOver.png')
+        self.gameOverImage = pygwidgets.Image(
+            self.window, (140, 180), "images/gameOver.png"
+        )
 
-        self.pausedText = pygwidgets.DisplayText(self.window,
-                                        (0, 210), 'PAUSED',
-                                        width=WINDOW_WIDTH, justified='center',
-                                        fontSize=64, textColor=WHITE)
+        self.pausedText = pygwidgets.DisplayText(
+            self.window,
+            (0, 210),
+            "PAUSED",
+            width=WINDOW_WIDTH,
+            justified="center",
+            fontSize=64,
+            textColor=WHITE,
+        )
 
-        self.pausedHintText = pygwidgets.DisplayText(self.window,
-                                        (0, 285), 'Press P to resume',
-                                        width=WINDOW_WIDTH, justified='center',
-                                        fontSize=28, textColor=WHITE)
+        self.pausedHintText = pygwidgets.DisplayText(
+            self.window,
+            (0, 285),
+            "Press P to resume",
+            width=WINDOW_WIDTH,
+            justified="center",
+            fontSize=28,
+            textColor=WHITE,
+        )
 
-        self.titleText = pygwidgets.DisplayText(self.window,
-                                        (70, GAME_HEIGHT + 17),
-                                        'Score:                                 High Score:',
-                                        fontSize=24, textColor=WHITE)
+        self.titleText = pygwidgets.DisplayText(
+            self.window,
+            (70, GAME_HEIGHT + 17),
+            "Score:                                 High Score:",
+            fontSize=24,
+            textColor=WHITE,
+        )
 
-        self.scoreText = pygwidgets.DisplayText(self.window,
-                                        (80, GAME_HEIGHT + 47), '0',
-                                        fontSize=36, textColor=WHITE,
-                                        justified='right')
+        self.scoreText = pygwidgets.DisplayText(
+            self.window,
+            (80, GAME_HEIGHT + 47),
+            "0",
+            fontSize=36,
+            textColor=WHITE,
+            justified="right",
+        )
 
-        self.highScoreText = pygwidgets.DisplayText(self.window,
-                                        (270, GAME_HEIGHT + 47), '',
-                                        fontSize=36, textColor=WHITE,
-                                        justified='right')
+        self.highScoreText = pygwidgets.DisplayText(
+            self.window,
+            (270, GAME_HEIGHT + 47),
+            "",
+            fontSize=36,
+            textColor=WHITE,
+            justified="right",
+        )
 
-        pygame.mixer.music.load('sounds/background.mid')
-        self.dingSound = pygame.mixer.Sound('sounds/ding.wav')
-        self.gameOverSound = pygame.mixer.Sound('sounds/gameover.wav')
+        pygame.mixer.music.load("sounds/background.mid")
+        self.dingSound = pygame.mixer.Sound("sounds/ding.wav")
+        self.gameOverSound = pygame.mixer.Sound("sounds/gameover.wav")
 
         # Instantiate objects
         self.oPlayer = Player(self.window)
@@ -130,11 +185,11 @@ class ScenePlay(pyghelpers.Scene):
         # that looks like this:
         #  {'highest': highestScore, 'lowest': lowestScore}
         infoDict = self.request(SCENE_HIGH_SCORES, HIGH_SCORES_DATA)
-        self.highestHighScore = infoDict['highest']
+        self.highestHighScore = infoDict["highest"]
         self.highScoreText.setValue(self.highestHighScore)
-        self.lowestHighScore = infoDict['lowest']
+        self.lowestHighScore = infoDict["lowest"]
 
-    def reset(self):   # start a new game
+    def reset(self):  # start a new game
         self.score = 0
         self.difficultyLevel = 0
         self.scoreText.setValue(self.score)
@@ -200,16 +255,18 @@ class ScenePlay(pyghelpers.Scene):
             self.dingSound.play()
             self.score = self.score + (nGoodiesHit * POINTS_FOR_GOODIE)
 
-        self.difficultyLevel = min(MAX_DIFFICULTY_LEVEL,
-                                   self.score // POINTS_PER_DIFFICULTY_LEVEL)
+        self.difficultyLevel = min(
+            MAX_DIFFICULTY_LEVEL, self.score // POINTS_PER_DIFFICULTY_LEVEL
+        )
 
         # Tell the BaddieMgr to move all the Baddies
         # Returns the number of Baddies that fell off the bottom
-        nBaddiesEvaded  = self.oBaddieMgr.update(self.difficultyLevel)
+        nBaddiesEvaded = self.oBaddieMgr.update(self.difficultyLevel)
         self.score = self.score + (nBaddiesEvaded * POINTS_FOR_BADDIE_EVADED)
-        self.difficultyLevel = min(MAX_DIFFICULTY_LEVEL,
-                                   self.score // POINTS_PER_DIFFICULTY_LEVEL)
-        
+        self.difficultyLevel = min(
+            MAX_DIFFICULTY_LEVEL, self.score // POINTS_PER_DIFFICULTY_LEVEL
+        )
+
         self.scoreText.setValue(self.score)
 
         # Check if the Player has hit any Baddie
@@ -222,33 +279,31 @@ class ScenePlay(pyghelpers.Scene):
             self.draw()  # force drawing of game over message
 
             if self.score > self.lowestHighScore:
-                scoreString = 'Your score: ' + str(self.score) + '\n'
+                scoreString = "Your score: " + str(self.score) + "\n"
                 if self.score > self.highestHighScore:
-                    dialogText = (scoreString +
-                                       'is a new high score, CONGRATULATIONS!')
+                    dialogText = scoreString + "is a new high score, CONGRATULATIONS!"
                 else:
-                    dialogText = (scoreString +
-                                      'gets you on the high scores list.')
+                    dialogText = scoreString + "gets you on the high scores list."
 
                 result = showCustomYesNoDialog(self.window, dialogText)
-                if result: # navigate
-                    self.goToScene(SCENE_HIGH_SCORES, self.score)  
+                if result:  # navigate
+                    self.goToScene(SCENE_HIGH_SCORES, self.score)
 
             self.newGameButton.enable()
             self.highScoresButton.enable()
             self.soundCheckBox.enable()
             self.quitButton.enable()
-    
+
     def draw(self):
         self.window.fill(BLACK)
-    
+
         # Tell the managers to draw all the Baddies and Goodies
         self.oBaddieMgr.draw()
         self.oGoodieMgr.draw()
-    
+
         # Tell the Player to draw itself
         self.oPlayer.draw()
-    
+
         # Draw all the info at the bottom of the window
         self.controlsBackground.draw()
         self.titleText.draw()

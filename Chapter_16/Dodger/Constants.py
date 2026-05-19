@@ -7,14 +7,14 @@ DIALOG_BOX_OFFSET = 35
 DIALOG_BOX_WIDTH = WINDOW_WIDTH - (2 * DIALOG_BOX_OFFSET)
 
 # Scene keys
-SCENE_SPLASH = 'scene splash'
-SCENE_PLAY = 'scene play'
-SCENE_HIGH_SCORES = 'scene high scores'
+SCENE_SPLASH = "scene splash"
+SCENE_PLAY = "scene play"
+SCENE_HIGH_SCORES = "scene high scores"
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 POINTS_FOR_GOODIE = 25
 POINTS_FOR_BADDIE_EVADED = 1
-HIGH_SCORES_DATA = 'high scores data'
+HIGH_SCORES_DATA = "high scores data"
 N_HIGH_SCORES = 10

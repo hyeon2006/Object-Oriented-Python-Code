@@ -1,13 +1,12 @@
 # Player
-import pygame
 import pygwidgets
-from Constants import *
+from Constants import GAME_HEIGHT, WINDOW_WIDTH
 
-class Player():
+
+class Player:
     def __init__(self, window):
         self.window = window
-        self.image = pygwidgets.Image(window,
-                                (-100, -100), 'images/player.png')
+        self.image = pygwidgets.Image(window, (-100, -100), "images/player.png")
         playerRect = self.image.getRect()
         self.maxX = WINDOW_WIDTH - playerRect.width
         self.maxY = GAME_HEIGHT - playerRect.height

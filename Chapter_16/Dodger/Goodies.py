@@ -1,18 +1,20 @@
 # Goodie and GoddieMgr classes
+import random
+
 import pygame
 import pygwidgets
-import random
 from Constants import *
 
-class Goodie():
+
+class Goodie:
     MIN_SIZE = 10
     MAX_SIZE = 40
     MIN_SPEED = 1
     MAX_SPEED = 8
     # Load the image once
-    GOODIE_IMAGE = pygame.image.load('images/goodie.png')
-    RIGHT = 'right'
-    LEFT = 'left'
+    GOODIE_IMAGE = pygame.image.load("images/goodie.png")
+    RIGHT = "right"
+    LEFT = "left"
 
     def __init__(self, window):
         self.window = window
@@ -22,16 +24,15 @@ class Goodie():
         self.direction = random.choice([Goodie.LEFT, Goodie.RIGHT])
         if self.direction == Goodie.LEFT:  # start on right side of the window
             self.x = WINDOW_WIDTH
-            self.speed = - random.randrange(Goodie.MIN_SPEED,
-                                                            Goodie.MAX_SPEED + 1)
-            self.minLeft = - size
+            self.speed = -random.randrange(Goodie.MIN_SPEED, Goodie.MAX_SPEED + 1)
+            self.minLeft = -size
         else:  # start on left side of the window
             self.x = 0 - size
-            self.speed = random.randrange(Goodie.MIN_SPEED,
-                                                          Goodie.MAX_SPEED + 1)
+            self.speed = random.randrange(Goodie.MIN_SPEED, Goodie.MAX_SPEED + 1)
 
-        self.image = pygwidgets.Image(self.window,
-                                                     (self.x, self.y), Goodie.GOODIE_IMAGE)
+        self.image = pygwidgets.Image(
+            self.window, (self.x, self.y), Goodie.GOODIE_IMAGE
+        )
         percent = int((size * 100) / Goodie.MAX_SIZE)
         self.image.scale(percent, False)
 
@@ -57,7 +58,7 @@ class Goodie():
         return collidedWithPlayer
 
 
-class GoodieMgr():
+class GoodieMgr:
     GOODIE_RATE_LO = 90
     GOODIE_RATE_HI = 111
 
@@ -83,7 +84,7 @@ class GoodieMgr():
             elif oGoodie.collide(thePlayerRect):
                 self.goodiesList.remove(oGoodie)  # remove this Goodie
                 nGoodiesHit = nGoodiesHit + 1
-        
+
         # If the correct amount of frames have passed,
         # add a new Goodie (and reset the counter)
         self.nFramesTilNextGoodie = self.nFramesTilNextGoodie - 1
@@ -91,8 +92,8 @@ class GoodieMgr():
             oGoodie = Goodie(self.window)
             self.goodiesList.append(oGoodie)
             self.nFramesTilNextGoodie = random.randrange(
-                                                            GoodieMgr.GOODIE_RATE_LO,
-                                                            GoodieMgr.GOODIE_RATE_HI)
+                GoodieMgr.GOODIE_RATE_LO, GoodieMgr.GOODIE_RATE_HI
+            )
 
         return nGoodiesHit  # return number of Goodies that contacted player
 

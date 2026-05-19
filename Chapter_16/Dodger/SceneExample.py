@@ -4,8 +4,9 @@
 # This is a template for what a Scene should look like
 #
 
-import pygwidgets
 import pyghelpers
+import pygwidgets
+
 
 class MyScene(pyghelpers.Scene):  # Inherits from the Scene class in the pyghelpers file
     def __init__(self, window):
@@ -17,10 +18,10 @@ class MyScene(pyghelpers.Scene):  # Inherits from the Scene class in the pyghelp
         self.window = window
 
         # As a sample, let's create a button
-        self.navButton = pygwidgets.TextButton(self.window, (300, 230), 'Navigate')
+        self.navButton = pygwidgets.TextButton(self.window, (300, 230), "Navigate")
 
     def getSceneKey(self):
-        return 'Some string or CONSTANT that uniquely represents this scene'
+        return "Some string or CONSTANT that uniquely represents this scene"
 
     def enter(self, data):
         """
@@ -39,7 +40,9 @@ class MyScene(pyghelpers.Scene):  # Inherits from the Scene class in the pyghelp
         """
         for event in events:
             if self.navButton.handleEvent(event):
-                print('Clicked on the nav button - typically add a: self.goToScene("NewScene")')
+                print(
+                    'Clicked on the nav button - typically add a: self.goToScene("NewScene")'
+                )
 
     def update(self):
         """

@@ -1,34 +1,37 @@
 # Baddie and BaddieMgr classes
 
+import random
+
 import pygame
 import pygwidgets
-import random
-from Constants import *
+from Constants import GAME_HEIGHT, WINDOW_WIDTH
+
 
 # Baddie class
-class Baddie():
+class Baddie:
     MIN_SIZE = 10
     MAX_SIZE = 40
     MIN_SPEED = 1
     MAX_SPEED = 8
     # Load the image only once
-    BADDIE_IMAGE = pygame.image.load('images/baddie.png')
+    BADDIE_IMAGE = pygame.image.load("images/baddie.png")
 
     def __init__(self, window, speedAdjustment=0):
         self.window = window
         # Create the image object
         size = random.randrange(Baddie.MIN_SIZE, Baddie.MAX_SIZE + 1)
         self.x = random.randrange(0, WINDOW_WIDTH - size)
-        self.y = 0 - size # start above the window
-        self.image = pygwidgets.Image(self.window, (self.x, self.y),
-                                      Baddie.BADDIE_IMAGE)
+        self.y = 0 - size  # start above the window
+        self.image = pygwidgets.Image(
+            self.window, (self.x, self.y), Baddie.BADDIE_IMAGE
+        )
 
         # Scale it
         percent = (size * 100) / Baddie.MAX_SIZE
         self.image.scale(percent, False)
-        self.speed = (random.randrange(Baddie.MIN_SPEED,
-                                                      Baddie.MAX_SPEED + 1) +
-                                                      speedAdjustment)
+        self.speed = (
+            random.randrange(Baddie.MIN_SPEED, Baddie.MAX_SPEED + 1) + speedAdjustment
+        )
 
     def update(self):  # move the Baddie down
         self.y = self.y + self.speed
@@ -45,8 +48,9 @@ class Baddie():
         collidedWithPlayer = self.image.overlaps(playerRect)
         return collidedWithPlayer
 
+
 # BaddieMgr class
-class BaddieMgr():
+class BaddieMgr:
     ADD_NEW_BADDIE_RATE = 8  # how often to add a new Baddie
     MIN_ADD_NEW_BADDIE_RATE = 3
 
@@ -74,8 +78,10 @@ class BaddieMgr():
         if self.nFramesTilNextBaddie == 0:
             oBaddie = Baddie(self.window, difficultyLevel)
             self.baddiesList.append(oBaddie)
-            addNewBaddieRate = max(BaddieMgr.MIN_ADD_NEW_BADDIE_RATE,
-                                   BaddieMgr.ADD_NEW_BADDIE_RATE - difficultyLevel)
+            addNewBaddieRate = max(
+                BaddieMgr.MIN_ADD_NEW_BADDIE_RATE,
+                BaddieMgr.ADD_NEW_BADDIE_RATE - difficultyLevel,
+            )
             self.nFramesTilNextBaddie = addNewBaddieRate
 
         # Return that count of Baddies that were removed

@@ -7,14 +7,17 @@
 
 # 1 - Import packages
 import os
-# The next line is here just in case you are running from the command line
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 import pygame
 import pyghelpers
-from SceneSplash import *
-from ScenePlay import *
-from SceneHighScores import *
+from Constants import WINDOW_HEIGHT, WINDOW_WIDTH
+from SceneHighScores import SceneHighScores
+from ScenePlay import ScenePlay
+from SceneSplash import SceneSplash
+
+# The next line is here just in case you are running from the command line
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 
 # 2 - Define constants
 FRAMES_PER_SECOND = 40
@@ -27,9 +30,7 @@ window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 # 5 - Initialize variables
 # Instantiate all scenes and store them in a list
-scenesList = [SceneSplash(window),
-                    SceneHighScores(window),
-                    ScenePlay(window)]
+scenesList = [SceneSplash(window), SceneHighScores(window), ScenePlay(window)]
 
 # Create the scene manager, passing in the scenes list and the FPS
 oSceneMgr = pyghelpers.SceneMgr(scenesList, FRAMES_PER_SECOND)

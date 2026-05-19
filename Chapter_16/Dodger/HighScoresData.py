@@ -1,18 +1,21 @@
 # HighScoresData class
-from Constants import *
-from pathlib import Path
 import json
+from pathlib import Path
 
-class HighScoresData():
+from Constants import N_HIGH_SCORES
+
+
+class HighScoresData:
     """The data file is stored as a list of lists in JSON format.
     Each list is made up of a name and a score:
         [[name, score], [name, score], [name, score] ...]
     In this class, all scores are kept in self.scoresList
     The list is kept in order of scores, highest to lowest.
     """
+
     def __init__(self):
-        self.BLANK_SCORES_LIST = N_HIGH_SCORES * [['-----', 0]]
-        self.oFilePath = Path('HighScores.json')
+        self.BLANK_SCORES_LIST = N_HIGH_SCORES * [["-----", 0]]
+        self.oFilePath = Path("HighScores.json")
 
         # Try to open and load the data from the data file
         try:
@@ -68,4 +71,3 @@ class HighScoresData():
         highestScore = highestEntry[1]
         lowestScore = lowestEntry[1]
         return highestScore, lowestScore
-
